@@ -39,7 +39,7 @@ func binarySearch(ip string, ipLocationMap []service.IpLocation, c *gin.Context)
 	length := len(ipLocationMap)
 	midIndex := int(math.Floor(float64(length) / 2))
 
-	//IP TO INT
+	//IP TRANSFER TO INT 
 	ret := big.NewInt(0)
 	ret.SetBytes(net.ParseIP(ip).To4())
 	intIP := ret.Int64()
