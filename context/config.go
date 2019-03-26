@@ -41,6 +41,7 @@ func NewConfig(ctx *cli.Context) *Config {
 	c.appCopyright = ctx.App.Copyright
 	c.appVersion = ctx.App.Version
 	c.SetValuesFromCliContext(ctx)
+	c.setLog()
 
 	return c
 }
@@ -67,8 +68,6 @@ func (c *Config) SetValuesFromCliContext(ctx *cli.Context) error {
 	if ctx.GlobalIsSet("ip-file") || c.ipFile == "" {
 		c.ipFile = ctx.GlobalString("ip-file")
 	}
-
-	c.setLog()
 
 	return nil
 }
@@ -113,23 +112,23 @@ func (c *Config) HttpServerMode() string {
 	return c.httpServerMode
 }
 
-func (conf *Config) GetIpFile() string {
-	return conf.ipFile
+func (c *Config) GetIpFile() string {
+	return c.ipFile
 }
 
 type Log struct {
 	Logger *logging.Logger
 }
 
-func (conf *Config) setLog() {
-	logFile := conf.LogFilePath()
+func (c *Config) setLog() {
+	logFile := c.LogFilePath()
 	backend1 := logging.NewLogBackend(logFile, "", 0)
 	var format1 = logging.MustStringFormatter(
 		`%{level:.4s} %{time:2006-01-02T15:04:05.999}  %{id:03x} %{message}`,
 	)
 	backend1Leveled := logging.NewBackendFormatter(backend1, format1)
 
-	if conf.debug {
+	if c.debug {
 		backend2 := logging.NewLogBackend(os.Stderr, "", 0)
 		var format2 = logging.MustStringFormatter(
 			`%{color}%{time:2006-01-02T15:04:05.999} %{level:.4s} %{id:03x}%{color:reset} %{message}`,
@@ -140,11 +139,11 @@ func (conf *Config) setLog() {
 		logging.SetBackend(backend1Leveled)
 	}
 
-	conf.myLog = logging.MustGetLogger("example")
+	c.myLog = logging.MustGetLogger("example")
 }
 
-func (conf *Config) GetLog() *logging.Logger {
-	return conf.myLog
+func (c *Config) GetLog() *logging.Logger {
+	return c.myLog
 }
 
 func pathExists(path string) (bool, error) {
@@ -158,7 +157,7 @@ func pathExists(path string) (bool, error) {
 	return false, err
 }
 
-func (conf *Config) LogFilePath() *os.File {
+func (c *Config) LogFilePath() *os.File {
 	currentDate := time.Now().Format("2006-01-02")
 	path := "logs/"
 	isExist, _ := pathExists(path)
